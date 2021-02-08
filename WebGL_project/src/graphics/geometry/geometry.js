@@ -12,9 +12,15 @@ class Geometry {
    * @param {Shader} shader Shading object used to shade geometry
    * @returns {Geometry} Geomtric object created
    */
-  constructor(shader) {
-      this.shader = shader;
-  }
+  constructor(shader, x, y) {
+    this.vertices = [];
+    this.shader = shader;
+
+    this.x = x;
+    this.y = y;
+    
+    this.modelMatrix = new Matrix4();
+}
 
   /**
    * A callback used to modify a geometry every frame (60 typically).

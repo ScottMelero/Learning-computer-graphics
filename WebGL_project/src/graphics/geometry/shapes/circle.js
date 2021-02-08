@@ -1,53 +1,72 @@
+var transX = (Math.random()*0.008)-0.004;
+var transY = (Math.random()*0.008)-0.004;
+
 /**
- * Specifies a triangle. A subclass of geometry.
+ * Specifies a Circle. A subclass of geometry.
  *
  * @author Lucas N. Ferreira
- * @this {Triangle}
+ * @this {Circle}
  */
 class Circle extends Geometry {
   /**
-   * Constructor for Triangle.
+   * Constructor for Circle.
    *
    * @constructor
    * @param {Shader} shader Shading object used to shade geometry
-   * @returns {Triangle} Triangle created
+   * @returns {Circle} Circle created
    */
-  constructor(shader, x, y, seg) {
-      super(shader);
+  constructor(shader,x,y) {
+      super(shader,x,y);
 
-      this.vertices = this.generateTriangleVertices(x, y, seg);
-      this.faces = {0: this.verticies};
+      this.vertices = this.generateCircleVertices(x, y);
+      this.faces = {0: this.vertices};
 
       // CALL THIS AT THE END OF ANY SHAPE CONSTRUCTOR
       this.interleaveVertices();
   }
 
-  generateTriangleVertices(x , y, seg) {
-    var vertices = []
+  // a circle consists of triangles 
+  generateCircleVertices(x, y) {
+      var vertices = []
+      
+      var seg = document.getElementById("Segment").value;
 
+      var size = document.getElementById("Size").value/200;
+      var p = 6*Math.PI;
 
-    for(var i = 0; i <= seg; i++)
-    {
-        x = x * Math.cos();
-        y = y * Math.sin();
-        var size = document.getElementById("Size").value/200;  
+      var delta = (2*Math.PI) / seg;
+      var center = new Vertex(x, y, 0.0);
 
-        // Vertex 0
-        var vertex0 = new Vertex(x, y + size, 0.0);
-        vertices.push(vertex0);
+      // Draw circle 
+      for(var theta = 0; theta < p; theta += delta) {
+         var x2 = (Math.cos(theta) * size) + x;
+         var y2 = (Math.sin(theta) * size) + y;
 
-        // Vertex1
-        var vertex1 = new Vertex(x, y, 0.0);
-        vertices.push(vertex1);
+         var x3 = (Math.cos(theta + delta) * size) + x;
+         var y3 = (Math.sin(theta + delta) * size) + y;
 
-        // Vertex 2
-        var vertex2 = new Vertex(x + size, y, 0.0);
-        vertices.push(vertex2);
+         vertices.push(center);
+         vertices.push(new Vertex(x2, y2, 0.0));
+         vertices.push(new Vertex(x3, y3, 0.0));
+     
+      }
+       return vertices;
+  }
 
-        x = x + x/10;
-        y = y + y/10;
+  render() {
+      // Create translation matrix
+      this.translationMatrix = new Matrix4();
+      this.translationMatrix.setTranslate(transX,transY,0);
 
-        return vertices;
-    }
+      // reset timer and x and y translate variables
+      if(timer >= 30) {
+          timer = 0;
+
+          transX = (Math.random()*0.008)-0.004;
+          transY = (Math.random()*0.008)-0.004;
+      }
+      this.modelMatrix = this.modelMatrix.multiply(this.translationMatrix);
+
+      this.shader.setUniform("u_ModelMatrix", this.modelMatrix.elements);
   }
 }

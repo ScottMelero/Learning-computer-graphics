@@ -18,6 +18,14 @@ class Square extends Geometry {
       this.vertices = this.generateSquareVertices(x, y);
       this.faces = {0: this.verticies};
 
+      // Translate origin to center of the object and update matrix
+      this.translationMatrix = new Matrix4();
+      this.translationMatrix.setTranslate(x, y, 0);
+
+      // Rotate the matrix around object's center
+      this.rotationMatrix = new Matrix4();
+      this.rotationMatrix.setRotate(-0.5, 0, 0, 1);
+
       // CALL THIS AT THE END OF ANY SHAPE CONSTRUCTOR
       this.interleaveVertices();
   }
@@ -53,4 +61,12 @@ class Square extends Geometry {
 
       return vertices;
    }
+
+   render() {
+     this.modelMatrix = this.modelMatrix.multiply(this.rotationMatrix);
+     // this.modelMatrix = this.modelMatrix.multiply(this.translationMatrix);
+     // this.modelMatrix = this.modelMatrix.multiply(this.scalingMatrix);
+
+     this.shader.setUniform("u_ModelMatrix", this.modelMatrix.elements);
+  }
 }
